@@ -17,6 +17,7 @@ var SolutionTree = function (x, y) {
   this.loc = [x, y];
   this.children = [];
   this.parent = null;
+  this.n;
 
 };
 SolutionTree.prototype.addChild = function (node) {
@@ -35,10 +36,13 @@ SolutionTree.prototype.hasRookCollision = function (node) {
 SolutionTree.prototype.isSelf = function (node) {
   return this.loc[0] === node.loc[0] && this.loc[1] === node.loc[1];
 };
-SolutionTree.prototype.generateBoard = function(tuples) {
+SolutionTree.prototype.generateBoard = function(n) {
+  this.loc = null;
+  this.n = n;
 
 };
-SolutionTree.prototype.generateSolutions = function() {
+SolutionTree.prototype.placePiece = function () {
+
   // do something to self
   // iterate through children, call generate 
 };
@@ -47,32 +51,34 @@ SolutionTree.prototype.generateSolutions = function() {
 
 window.findNRooksSolution = function(n) {
 
-  var solutionTree = new SolutionTree(-1, -1);
-  solutionTree.loc = null;
-  solutionTree.addChild(new SolutionTree(0, 0));
-  var depth = 0;
-  while (depth < n) {
+  // return new SolutionTree().generateBoard(n);
 
+  // var solutionTree = new SolutionTree(-1, -1);
+  // solutionTree.loc = null;
+  // solutionTree.addChild(new SolutionTree(0, 0));
+  // var depth = 0;
+  // while (depth < n) {
+
+  // }
+  var toggleStack = [];
+  var rooksOnBoard = 0;
+  var solution = new Board({n});
+
+  for (var row = 0; row < n; row++) {
+    for (var col = 0; col < n; col++) {
+      solution.togglePiece(row, col);
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(row, col);
+      } else {
+        toggleStack.push([row, col]);
+        rooksOnBoard++;
+        if (rooksOnBoard === n) { 
+          console.log(toggleStack);
+          return solution.rows(); 
+        }
+      } 
+    }
   }
-  // var solution = new Board({n});
-
-
-  // var tempSolution = new SolutionTree();
-  // var temp = new Node(1, 2);
-  // if (!tempSolution.hasRookCollision(temp)) { temp.addChild(temp); }
-
-  /*
-    Add null location head
-    Add every possible first rook
-      Iterate through children, push each possible second rook, recursively
-
-
-
-  */
-
-  console.log('??', solution);
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution.rows();
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
