@@ -44,62 +44,137 @@ SolutionTree.prototype.generateBoard = function(n) {
 SolutionTree.prototype.placePiece = function () {
 
   // do something to self
-  // iterate through children, call generate 
+  // iterate through children, call generate
 };
 
 
+window.unzip = function (arr){
+  var returnArray = [];
+  for (var i = 0; i < arr.length; i++) {
+    var tmp = new Array(arr.length).fill(0);
+    tmp[arr[i]] = 1;
+    returnArray.push(tmp);
+  }
+  return returnArray;
+}
 
 window.findNRooksSolution = function(n) {
-
-  // return new SolutionTree().generateBoard(n);
-
-  // var solutionTree = new SolutionTree(-1, -1);
-  // solutionTree.loc = null;
-  // solutionTree.addChild(new SolutionTree(0, 0));
-  // var depth = 0;
-  // while (depth < n) {
-
-  // }
-  var toggleStack = [];
-  var rooksOnBoard = 0;
-  var solution = new Board({n});
-
-  for (var row = 0; row < n; row++) {
-    for (var col = 0; col < n; col++) {
-      solution.togglePiece(row, col);
-      if (solution.hasAnyRooksConflicts()) {
-        solution.togglePiece(row, col);
-      } else {
-        toggleStack.push([row, col]);
-        rooksOnBoard++;
-        if (rooksOnBoard === n) { 
-          console.log(toggleStack);
-          return solution.rows(); 
-        }
-      } 
-    }
+  var board = new Array(n);
+  for (var i = 0; i < n; i++) {
+    board[i] = i;
   }
+  return unzip(board);
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  //START http://stackoverflow.com/questions/9960908/permutations-in-javascript/37580979#37580979
+  function permute(permutation) {
+    var length = permutation.length,
+        result = new Array([0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600][length]),
+        c = new Array(length).fill(0),
+        i = 1,
+        j = 1;
+
+    result[0] = permutation.slice();
+    while (i < length) {
+      if (c[i] < i) {
+        var k = (i % 2) ? c[i] : 0,
+            p = permutation[i];
+        permutation[i] = permutation[k];
+        permutation[k] = p;
+        ++c[i];
+        i = 1;
+        result[j] = permutation.slice();
+        ++j;
+      } else {
+        c[i] = 0;
+        ++i;
+      }
+    }
+    return result;
+  }
+  //END http://stackoverflow.com/questions/9960908/permutations-in-javascript/37580979#37580979
+  var board = new Array(n);
+  for (var i = 0; i < n; i++) {
+    board[i] = i;
+  }
+  return permute(board).length;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  if (n===0) return [];
+  if (n===1) return [[1]];
+  if (n===2) return [[0,0],[0,0]];
+  if (n===3) return [[0,0,0],[0,0,0],[0,0,0]];
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  //START http://stackoverflow.com/questions/9960908/permutations-in-javascript/37580979#37580979
+  function permute(permutation) {
+    var length = permutation.length,
+        result = new Array([0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600][length]),
+        c = new Array(length).fill(0),
+        i = 1,
+        j = 1;
+
+    result[0] = permutation.slice();
+    while (i < length) {
+      if (c[i] < i) {
+        var k = (i % 2) ? c[i] : 0,
+            p = permutation[i];
+        permutation[i] = permutation[k];
+        permutation[k] = p;
+        ++c[i];
+        i = 1;
+        //console.log(permutation.slice());
+        if (!hasDiagnoalConflict(permutation.slice())) {
+          return permutation.slice();
+        }
+        result[j] = permutation.slice();
+        ++j;
+      } else {
+        c[i] = 0;
+        ++i;
+      }
+    }
+    return [];//result;
+  }
+  //END http://stackoverflow.com/questions/9960908/permutations-in-javascript/37580979#37580979
+  function hasDiagnoalConflict(arr){
+    for (var j = 0; j < arr.length; j++) {
+      for (var i = 0; i < arr.length; i++) {
+        console.log("-------")
+        console.log(Math.abs(arr[j] - arr[i]));
+        console.log((i - j + 1));
+        if (Math.abs(arr[j] - arr[i]) !== (i - j + 1)) {
+          return true;
+        }
+      }
+    }
+    return false;
+    // for (var i = 0; i < arr.length - 1; i++) {
+    //   if (Math.abs(arr[i] - arr[i+1]) < 2) {
+    //     return true;
+    //   }
+    // }
+    // return false;
+  }
+
+  var board = new Array(n);
+  for (var i = 0; i < n; i++) {
+    board[i] = i;
+  }
+  //console.log(unzip(permute(board)));
+  return unzip(permute(board));
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solution = new Board({n});
+  for (var q0Row = 0; q0Row < n; q0Row++) {
+    for (var q0Col = 0; q0Col < n; q0Col++) {
+      solution.togglePiece(q0Row,q0Col);
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+    }
+  }
 };
